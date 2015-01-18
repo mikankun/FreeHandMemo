@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    <item android:id="@+id/action_settings" android:title="@string/action_settings"
+        android:orderInCategory="100" app:showAsAction="never" />
+
+
+    <item android:id="@+id/change_color" android:title="@string/change_color"
+      android:orderInCategory="200"  app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/save" android:title="@string/save"
+        android:orderInCategory="300" app:showAsAction="ifRoom"
+        />
+
+    <item android:id="@+id/reset" android:title="@string/reset"
+        android:orderInCategory="400" app:showAsAction="ifRoom"
+        />
+</menu>
