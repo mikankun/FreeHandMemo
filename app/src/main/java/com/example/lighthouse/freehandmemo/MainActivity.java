@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +39,7 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
     Paint   paint;
     Path    path;
     Bitmap  bitmap;
+
     float x1, y1;
     int w ,h;
 
@@ -48,38 +51,51 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
         setContentView(R.layout.activity_main);
 
         iv = (ImageView) findViewById(R.id.imageView);
-        Display disp = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        Point point = new Point();
-        disp.getSize(point);
-        w = point.x;//横幅
-        h = point.y;//縦幅
-
-       bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
+//        Display disp = ((WindowManager)getSystemService(Context.WINDOW_SERVICE))
+//                .getDefaultDisplay();
+//        Point point = new Point();
+//        disp.getSize(point);
+//
+//        w = point.x;//横幅
+//        h = point.y;//縦幅
+//
+//       bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
         //αチャネル、RGB 各8bit
 
         paint = new Paint();
         path = new Path();
-        canvas = new Canvas(bitmap);
+//        canvas = new Canvas(bitmap);
 
         paint.setStrokeWidth(5);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
-        canvas.drawColor(Color.WHITE);
-        iv.setImageBitmap(bitmap);
+//        canvas.drawColor(Color.WHITE);
+//        iv.setImageBitmap(bitmap);
         iv.setOnTouchListener(this);
 
 
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+       bitmap = Bitmap.createBitmap(iv.getWidth(),iv.getHeight(), Bitmap.Config.ARGB_8888);
+        canvas = new Canvas(bitmap);
+       iv.setImageBitmap(bitmap);
+
+    }
+
     /*
 
-    タッチイベントの取得
-     */
+            タッチイベントの取得
+             */
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
+
 
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
@@ -97,7 +113,7 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
                 path.moveTo(x,y);
                 break;
             case MotionEvent.ACTION_UP:
-                if( x == x1 && y == y1 ) y1= y1+1;
+                //if( x == x1 && y == y1 ) y1= y1+1;
                 path.quadTo(x1,y1,x,y);
                 canvas.drawPath(path,paint);
                 path.reset();
@@ -105,6 +121,19 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
         }
         iv = (ImageView) findViewById(R.id.imageView);
         iv.setImageBitmap(bitmap);
+
+
+        SharedPreferences prefs
+                = getSharedPreferences("count", Context.MODE_PRIVATE);
+        int wrongCount = prefs.getInt("wrong", 0);
+
+        wrongCount++;
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("wrong", wrongCount);
+        editor.apply();
+
+
 
         return true;
 
@@ -116,7 +145,7 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
 
         //テキスト入力を受け付けるビューを作成します。
         final EditText editView = new EditText(MainActivity.this);
-         final String saveDir = Environment.getExternalStorageDirectory().getPath() + "/memo";
+        final String saveDir = Environment.getExternalStorageDirectory().getPath() + "/memo";
         new AlertDialog.Builder(MainActivity.this)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle("テキスト入力ダイアログ")
@@ -139,7 +168,6 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fo);
                             fo.flush();
                             fo.close();
-
                             //ギャリーへ反映
                             ContentValues values = new ContentValues();
                             ContentResolver resolver = MainActivity.this.getContentResolver();
@@ -188,7 +216,8 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
                     .setItems(colornames, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    TypedArray colors = getResources().obtainTypedArray(R.array.selectable_colors);
+                                    TypedArray colors =
+                                            getResources().obtainTypedArray(R.array.selectable_colors);
                                     int color = colors.getColor(0, 0);
                                     paint.setColor(colors.getColor(which, 0));
                                 }
@@ -206,7 +235,7 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             builder.setTitle("確認")
-                   .setMessage("クリアします。よろしいですか？")
+                   .setMessage("クリアします。\n よろしいですか？")
                    .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {
