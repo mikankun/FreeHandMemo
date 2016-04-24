@@ -12,18 +12,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -51,16 +47,7 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
         setContentView(R.layout.activity_main);
 
         iv = (ImageView) findViewById(R.id.imageView);
-//        Display disp = ((WindowManager)getSystemService(Context.WINDOW_SERVICE))
-//                .getDefaultDisplay();
-//        Point point = new Point();
-//        disp.getSize(point);
-//
-//        w = point.x;//横幅
-//        h = point.y;//縦幅
-//
-//       bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
-        //αチャネル、RGB 各8bit
+
 
         paint = new Paint();
         path = new Path();
@@ -74,16 +61,17 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
 //        iv.setImageBitmap(bitmap);
         iv.setOnTouchListener(this);
 
-
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-
-       bitmap = Bitmap.createBitmap(iv.getWidth(),iv.getHeight(), Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(bitmap);
-       iv.setImageBitmap(bitmap);
+        if(bitmap == null) {
+            bitmap = Bitmap.createBitmap(iv.getWidth(), iv.getHeight(), Bitmap.Config.ARGB_8888);
+            canvas = new Canvas(bitmap);
+            canvas.drawColor(Color.WHITE);
+            iv.setImageBitmap(bitmap);
+        }
 
     }
 
@@ -148,8 +136,7 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
         final String saveDir = Environment.getExternalStorageDirectory().getPath() + "/memo";
         new AlertDialog.Builder(MainActivity.this)
                 .setIcon(android.R.drawable.ic_dialog_info)
-                .setTitle("テキスト入力ダイアログ")
-                        //setViewにてビューを設定します。
+                .setTitle(getString(R.string.inputfile))
                 .setView(editView)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -179,12 +166,12 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
                             e.printStackTrace();
                         }
 
-                        Toast.makeText(MainActivity.this, "保存しました", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, getString(R.string.savedone), Toast.LENGTH_LONG).show();
 
 
                     }
                 })
-                .setNegativeButton("キャンセル", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
 
     }
@@ -212,13 +199,13 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
             String[] colornames = getResources().getStringArray(R.array.color_name);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("色を選択してください")
+            builder.setTitle(getString(R.string.selectcolor))
                     .setItems(colornames, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     TypedArray colors =
                                             getResources().obtainTypedArray(R.array.selectable_colors);
-                                    int color = colors.getColor(0, 0);
+
                                     paint.setColor(colors.getColor(which, 0));
                                 }
                             }
@@ -230,19 +217,22 @@ public class MainActivity extends ActionBarActivity  implements View.OnTouchList
         if( id == R.id.save){
             save();
         }
-        //リセット
-        if( id == R.id.reset){
+        // クリア
+        if( id == R.id.clear){
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-            builder.setTitle("確認")
-                   .setMessage("クリアします。\n よろしいですか？")
+            builder.setTitle(getString(R.string.confirm))
+                   .setMessage(getString(R.string.confirmclear))
                    .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {
 
-                               bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-                               canvas = new Canvas(bitmap);
-                               iv.setImageBitmap(bitmap);
+                           bitmap = Bitmap.createBitmap(iv.getWidth(), iv.getHeight(), Bitmap.Config.ARGB_8888);
+                           canvas = new Canvas(bitmap);
+                           canvas.drawColor(Color.WHITE);
+                           iv.setImageBitmap(bitmap);
+
+                           Toast.makeText(MainActivity.this, getString(R.string.cleardone), Toast.LENGTH_LONG).show();
                            }
                        }
                     )

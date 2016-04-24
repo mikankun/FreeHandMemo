@@ -7,5 +7,17 @@
 
     <string name="change_color">色を変える</string>
     <string name="save">保存</string>
-    <string name="reset">リセット</string>
+    <string name="clear">クリア</string>
+    <string name="confirm">確認</string>
+    <string name="cancel">キャンセル</string>
+
+
+
+    <string name="inputfile">ファイル名を入力してください</string>
+    <string name="selectcolor">色を選択してください</string>
+
+    <string name="savedone">保存しました</string>
+    <string name="cleardone">クリアしました</string>
+    <string name="confirmclear">クリアします。\nよろしいですか？</string>
+
 </resources>

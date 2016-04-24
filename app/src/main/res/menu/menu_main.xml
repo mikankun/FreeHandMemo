@@ -12,7 +12,7 @@
         android:orderInCategory="300" app:showAsAction="ifRoom"
         />
 
-    <item android:id="@+id/reset" android:title="@string/reset"
+    <item android:id="@+id/clear" android:title="@string/clear"
         android:orderInCategory="400" app:showAsAction="ifRoom"
         />
 </menu>
